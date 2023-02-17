@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100vw;
+            height: 100vh;
+            background: #535353;
+            margin: 0px;
+            padding: 0px;
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+
+        #cnv {
+            width: 96vw;
+            height: 90vh;
+            background: #000000;
+            position: fixed;
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="cnv"></canvas>
+
+    <script>
+        let w, h, cnv, ctx, anims = [];
+        let count = 1000;
+        function init() {
+
+            cnv = document.querySelector("#cnv");
+            ctx = cnv.getContext("2d");
+
+            resize();
+            animationLoop();
+        }
+
+        let mouse = {
+            x: undefined,
+            y: undefined
+        };
+
+        function resize() {
+            w = cnv.width = window.innerWidth;
+            h = cnv.height = window.innerHeight;
+            // console.log(cnv.width);
+
+        }
+        function drowScene() {
+            anims.map((anim) => {
+                anim.drow();
+                anim.update();
+
+            })
+        };
+
+        function mousemove(e) {
+            mouse.x = e.x;
+            mouse.y = e.y;
+        }
+
+        function mouseout(e) {
+            mouse.x = undefined;
+            mouse.y = undefined;
+        }
+
+
+        function animationLoop() {
+            if (anims.length < count) {
+                anims.push(new Anim());
+            }
+            ctx.globalCompositeOperation = "source-over";
+            ctx.fillStyle = "rgba(0, 0, 0, .5)"
+            ctx.fillRect(0, 0, w, h)
+            ctx.globalCompositeOperation = "lighter";
+            drowScene();
+            requestAnimationFrame(animationLoop)
+        }
+
+        function randomNumberGenerator(min, max) {
+            return Math.floor(Math.random() * (max - min)) + min;
+        }
+
+
+        class Anim {
+            constructor() {
+                this.x = Math.random() * w;
+                this.y = Math.random() * h;
+                this.style = "hsl(60, 80%, 50% )"
+                this.angle = Math.random() * 360;
+                this.sltAngle = this.angle;
+                this.speed = 10;
+
+            }
+            drow() {
+                ctx.beginPath();
+                ctx.moveTo(this.px, this.py);
+                ctx.lineTo(this.x, this.y);
+                ctx.strokeStyle = this.style;
+                ctx.lineWidth = 2;
+                ctx.stroke();
+                ctx.closePath();
+            };
+            update() {
+                this.px = this.x;
+                this.py = this.y;
+
+                if (mouse.x !== undefined) {
+                    this.angle = getAngle(this.x, this.y, mouse.x, mouse.y);
+                } else {
+                    this.angle += randomNumberGenerator(-10, 10);
+                }
+
+                this.radius = (Math.PI / 180) * this.angle;
+                this.x += this.speed * Math.sin(this.radius);
+                this.y += this.speed * Math.cos(this.radius);
+
+                if (this.x < 0 || this.x > w || this.y < 0 || this.y > h) {
+                    this.angle += 90;
+                }
+
+            }
+        }
+
+
+        function getAngle(x1, y1, x2, y2) {
+            let rad = Math.atan2(x2 - x1, y2 - y1)
+            return (rad * 180) / Math.PI;
+        };
+
+
+        window.addEventListener("DOMContentLoaded", init);
+        window.addEventListener("resize", resize);
+        window.addEventListener("click", mousemove);
+        window.addEventListener("dblclick", mouseout);
+    </script>
+
+</body>
+
+</html>

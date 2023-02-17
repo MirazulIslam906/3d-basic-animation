@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://unpkg.com/three@0.85.0/build/three.js"></script>
+    <script src="https://unpkg.com/three@0.85.0/examples/js/controls/OrbitControls.js"></script>
+    <button onclick="toggleWaypoint()">Toggle Waypoint</button>
+    <div id="state">Nav: Orbit Controls</div>
+</head>
+
+<body>
+    <style>
+        body {
+            background-color: #000;
+            margin: 0px;
+            overflow: hidden;
+        }
+
+        #state {
+            color: white;
+            font-family: Helvetica, Arial, Sans-Serif;
+
+        }
+    </style>
+    <script>
+        var scene, camera, renderer, controls;
+        var waypoint = false;
+
+        function init() {
+            scene = new THREE.Scene();
+
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            document.body.appendChild(renderer.domElement);
+            var texture = new THREE.TextureLoader().load('./okley.png');
+            var geometry = new THREE.BoxGeometry(1, 1, 1);
+            var material = new THREE.MeshBasicMaterial({ map: texture });
+            var cube = new THREE.Mesh(geometry, material);
+            scene.add(cube);
+
+            var sphereGeo = new THREE.SphereBufferGeometry(1, 66, 66);
+            var sphereMat = new THREE.MeshBasicMaterial({ wireframe: true });
+            var sphere = new THREE.Mesh(sphereGeo, sphereMat);
+            scene.add(sphere);
+
+            camera.position.z = 5;
+
+            controls = new THREE.OrbitControls(camera);
+
+        }
+
+        var animate = function () {
+
+            requestAnimationFrame(animate);
+
+            controls.update();
+
+            renderer.render(scene, controls.object);
+
+        };
+
+
+        init();
+
+        animate();
+    </script>
+
+</body>
+
+</html>
